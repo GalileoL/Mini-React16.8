@@ -1,4 +1,4 @@
-import { currentRoot, deletions, nextUnitOfWork, wipRoot } from "./reconciler";
+import { scheduleRoot } from "./reconciler";
 
 // this is render way before fiber (before React 15), as we say, stack reconciler
 // this is a recursive way to render the element to DOM
@@ -23,30 +23,6 @@ export function renderInReact15(element, container) {
   container.appendChild(dom);
 }
 
-export function createDom(fiber) {
-  const dom =
-    fiber.type === "TEXT_ELEMENT"
-      ? document.createTextNode("")
-      : document.createElement(element.type);
-
-  Object.keys(fiber.props)
-    .filter((key) => key !== "children")
-    .forEach((name) => {
-      dom[name] = fiber.props[name];
-    });
-  return dom;
-}
-
 export function render(element, container) {
-  // set work in progress root, building fiber tree root at this frame
-  wipRoot = {
-    dom: container,
-    props: {
-      children: [element],
-    },
-    alternate: currentRoot,
-  };
-  deletions = [];
-  // set next unit of work
-  nextUnitOfWork = wipRoot;
+  scheduleRoot(element, container);
 }
