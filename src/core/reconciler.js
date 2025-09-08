@@ -1,3 +1,5 @@
+import { injectScheduleUpdateRoot, prepareToUseHooks } from "./hooks";
+
 export function scheduleRoot(element, container) {
   // set work in progress root, building fiber tree root at this frame
   wipRoot = {
@@ -115,6 +117,8 @@ export let nextUnitOfWork = null;
 export let currentRoot = null; // last fiber tree
 export let wipRoot = null; // work in progress root
 export let deletions = null;
+export let wipFiber = null;
+export let hookIndex = null;
 
 function workLoop(deadline) {
   let shouldYield = false;
@@ -210,6 +214,10 @@ function updateHostComponent(fiber) {
 
 // update function component
 function updateFunctionComponent(fiber) {
+  prepareToUseHooks(fiber);
+  wipFiber = fiber;
+  hookIndex = 0;
+  wipFiber.hooks = [];
   const children = [fiber.type(fiber.props)];
   reconcilerChildren(fiber, children);
 }
@@ -269,3 +277,17 @@ function reconcilerChildren(wipFiber, elements) {
     index++;
   }
 }
+
+function scheduleUpdateRoot() {
+  if (!currentRoot) {
+    return;
+  }
+  wipRoot = {
+    dom: currentRoot.dom,
+    props: currentRoot.props,
+    alternate: currentRoot,
+  };
+  nextUnitOfWork = wipRoot;
+  deletions = [];
+}
+injectScheduleUpdateRoot(scheduleUpdateRoot);

@@ -2,7 +2,7 @@ import { galileoReact } from "../core";
 
 // const element = galileoReact.createElement(App, { name: "galileoPage" });
 const element = galileoReact.createElement("h1", null, "h1 world");
-const container = document.getElementById("app");
+const container = document.getElementById("root");
 galileoReact.render(element, container);
 const element2 = galileoReact.createElement("h2", null, "h2 world");
 setTimeout(() => {
